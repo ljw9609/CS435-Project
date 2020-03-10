@@ -243,7 +243,7 @@ def run_model(model, criterion, optimizer, running_mode='train',
                 if valid_loss < min_loss:
                     print(f'====== Loss decreased, save model ======')
                     min_loss = valid_loss
-                    torch.save(model, f'./model/epoch{epoch + 1}_loss{valid_loss}.pth')
+                    torch.save(model, f'./model/checkpoint_best.pt')
 
                 if np.abs(valid_loss - prev_loss) < stop_thr:
                     break
@@ -311,13 +311,13 @@ optimizer = optim.Adam(model.parameters(), lr=lr)
 start = time.time()
 model, loss = run_model(model, criterion, optimizer,
                         train_loader=train_loader, valid_loader=test_loader,
-                        n_epochs=20, device=device)
+                        n_epochs=50, device=device)
 end = time.time()
 print(f'Training Finished with {end - start} seconds')
 
 epoch = len(loss['train'])
 valid_loss = loss['valid'][-1]
-torch.save(model, f'./model/epoch{epoch}_loss{valid_loss}.pth')
+torch.save(model, f'./model/checkpoint_last.pt')
 
 with open(f'./model/output_epoch{epoch}_loss{valid_loss}.txt', 'a+') as f:
     f.write(f'Epoch {epoch} Loss {valid_loss}\n')
