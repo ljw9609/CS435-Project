@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import time
 import glob
 import os
 import numpy as np
@@ -301,11 +302,20 @@ model = Net()
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=lr)
 
-
+start = time.time()
 model, loss = run_model(model, criterion, optimizer,
                         train_loader=train_loader, valid_loader=test_loader,
-                        n_epochs=1, device=device)
+                        n_epochs=20, device=device)
+end = time.time()
+print(f'Training Finished with {end - start} seconds')
 
 epoch = len(loss['train'])
 valid_loss = loss['valid'][-1]
 torch.save(model, f'./model/epoch{epoch}_loss{valid_loss}.pth')
+
+with open(f'./model/output_epoch{epoch}_loss{valid_loss}.txt', 'a+') as f:
+    f.write(f'Epoch {epoch} Loss {valid_loss}\n')
+    f.write(','.join([str(l) for l in loss['train']]))
+    f.write('\n')
+    f.write(','.join([str(l) for l in loss['valid']]))
+    f.write('\n')
