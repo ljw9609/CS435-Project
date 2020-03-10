@@ -227,6 +227,7 @@ def run_model(model, criterion, optimizer, running_mode='train',
         loss = {'train': [], 'valid': []}
         
         prev_loss = np.Inf
+        min_loss = np.Inf
         for epoch in range(n_epochs):
             model, train_loss = _train(model, criterion, optimizer, train_loader, device=device)
             loss['train'].append(train_loss)
@@ -238,7 +239,12 @@ def run_model(model, criterion, optimizer, running_mode='train',
                 loss['valid'].append(valid_loss)
 
                 print(f'====== Epoch {epoch + 1}, training loss {train_loss}, valid loss {valid_loss} ======')
-                
+
+                if valid_loss < min_loss:
+                    print(f'====== Loss decreased, save model ======')
+                    min_loss = valid_loss
+                    torch.save(model, f'./model/epoch{epoch + 1}_loss{valid_loss}.pth')
+
                 if np.abs(valid_loss - prev_loss) < stop_thr:
                     break
                 prev_loss = valid_loss
